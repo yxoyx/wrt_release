@@ -65,7 +65,7 @@ update_feeds() {
     if ! grep -q "small-package" "$BUILD_DIR/$FEEDS_CONF"; then
         # 确保文件以换行符结尾
         [ -z "$(tail -c 1 "$BUILD_DIR/$FEEDS_CONF")" ] || echo "" >>"$BUILD_DIR/$FEEDS_CONF"
-        echo "src-git small8 https://github.com/kenzok8/small-package" >>"$BUILD_DIR/$FEEDS_CONF"
+        echo "src-git kiddin9 https://github.com/kiddin9/kwrt-packages" >>"$BUILD_DIR/$FEEDS_CONF"
     fi
 
     # 添加bpf.mk解决更新报错
@@ -89,7 +89,8 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-smartdns" "luci-app-ddns-go" "luci-app-rclone"
         "luci-app-ssr-plus" "luci-app-vssr" "luci-theme-argon" "luci-app-daed" "luci-app-dae"
         "luci-app-alist" "luci-app-argon-config" "luci-app-homeproxy" "luci-app-haproxy-tcp"
-        "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
+        "luci-app-openclash" "luci-app-mihomo"  "luci-app-appfilter" "luci-app-gecoosac" "luci-app-pushbot"
+        "luci-app-poweroffdevice" "luci-app-msd_lite" "luci-app-xupnpd"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
@@ -97,8 +98,9 @@ remove_unwanted_packages() {
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
         "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs"
         "shadowsocksr-libev" "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter"
+        "gecoosac" "msd_lite"
     )
-    local small8_packages=(
+    local kiddin9_packages=(
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq"
     )
 
@@ -111,8 +113,8 @@ remove_unwanted_packages() {
         \rm -rf ./feeds/packages/net/$pkg
     done
 
-    for pkg in "${small8_packages[@]}"; do
-        \rm -rf ./feeds/small8/$pkg
+    for pkg in "${kiddin9_packages[@]}"; do
+        \rm -rf ./feeds/kiddin9/$pkg
     done
 
     if [[ -d ./package/istore ]]; then
@@ -132,8 +134,8 @@ update_golang() {
     fi
 }
 
-install_small8() {
-    ./scripts/feeds install -p small8 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
+install_kiddin9() {
+    ./scripts/feeds install -p kiddin9 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
         naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
         tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
         luci-app-passwall alist luci-app-alist smartdns luci-app-smartdns v2dat mosdns luci-app-mosdns \
@@ -141,7 +143,8 @@ install_small8() {
         luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest \
         luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-openclash luci-app-homeproxy \
         luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf \
-        easytier luci-app-easytier
+        easytier luci-app-easytier gecoosac luci-app-gecoosac msd_lite luci-app-msd_lite luci-app-xupnpd \
+        luci-app-poweroffdevice luci-app-pushbot luci-app-fileassistant luci-app-usb-printer
 }
 
 install_feeds() {
@@ -149,8 +152,8 @@ install_feeds() {
     for dir in $BUILD_DIR/feeds/*; do
         # 检查是否为目录并且不以 .tmp 结尾，并且不是软链接
         if [ -d "$dir" ] && [[ ! "$dir" == *.tmp ]] && [ ! -L "$dir" ]; then
-            if [[ $(basename "$dir") == "small8" ]]; then
-                install_small8
+            if [[ $(basename "$dir") == "kiddin9" ]]; then
+                install_kiddin9
             else
                 ./scripts/feeds install -f -ap $(basename "$dir")
             fi
@@ -164,8 +167,8 @@ fix_default_set() {
         find "$BUILD_DIR/feeds/luci/collections/" -type f -name "Makefile" -exec sed -i "s/luci-theme-bootstrap/luci-theme-$THEME_SET/g" {} \;
     fi
 
-    if [ -d "$BUILD_DIR/feeds/small8/luci-theme-argon" ]; then
-        find "$BUILD_DIR/feeds/small8/luci-theme-argon" -type f -name "cascade*" -exec sed -i 's/--bar-bg/--primary/g' {} \;
+    if [ -d "$BUILD_DIR/feeds/kiddin9/luci-theme-argon" ]; then
+        find "$BUILD_DIR/feeds/kiddin9/luci-theme-argon" -type f -name "cascade*" -exec sed -i 's/--bar-bg/--primary/g' {} \;
     fi
 
     install -Dm755 "$BASE_PATH/patches/99_set_argon_primary" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/99_set_argon_primary"
@@ -294,22 +297,22 @@ update_ath11k_fw() {
 
 fix_mkpkg_format_invalid() {
     if [[ $BUILD_DIR =~ "imm-nss" ]]; then
-        if [ -f $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile ]; then
-            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/small8/v2ray-geodata/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile ]; then
+            sed -i 's/VER)-\$(PKG_RELEASE)/VER)-r\$(PKG_RELEASE)/g' $BUILD_DIR/feeds/kiddin9/v2ray-geodata/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile ]; then
-            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/small8/luci-lib-taskd/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile ]; then
+            sed -i 's/>=1\.0\.3-1/>=1\.0\.3-r1/g' $BUILD_DIR/feeds/kiddin9/luci-lib-taskd/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile ]; then
-            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-openclash/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile ]; then
+            sed -i 's/PKG_RELEASE:=beta/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-openclash/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-quickstart/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.8\.16-1/PKG_VERSION:=0\.8\.16/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-quickstart/Makefile
         fi
-        if [ -f $BUILD_DIR/feeds/small8/luci-app-store/Makefile ]; then
-            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
-            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/small8/luci-app-store/Makefile
+        if [ -f $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile ]; then
+            sed -i 's/PKG_VERSION:=0\.1\.27-1/PKG_VERSION:=0\.1\.27/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
+            sed -i 's/PKG_RELEASE:=$/PKG_RELEASE:=1/g' $BUILD_DIR/feeds/kiddin9/luci-app-store/Makefile
         fi
     fi
 }
@@ -345,7 +348,7 @@ chanage_cpuusage() {
 }
 
 update_tcping() {
-    local tcping_path="$BUILD_DIR/feeds/small8/tcping/Makefile"
+    local tcping_path="$BUILD_DIR/feeds/kiddin9/tcping/Makefile"
 
     if [ -d "$(dirname "$tcping_path")" ] && [ -f "$tcping_path" ]; then
         \rm -f "$tcping_path"
@@ -388,7 +391,7 @@ EOF
 
 update_pw_ha_chk() {
     local new_path="$BASE_PATH/patches/haproxy_check.sh"
-    local pw_share_dir="$BUILD_DIR/feeds/small8/luci-app-passwall/root/usr/share/passwall"
+    local pw_share_dir="$BUILD_DIR/feeds/kiddin9/luci-app-passwall/root/usr/share/passwall"
     local pw_ha_path="$pw_share_dir/haproxy_check.sh"
     local ha_lua_path="$pw_share_dir/haproxy.lua"
     local smartdns_lua_path="$pw_share_dir/helper_smartdns_add.lua"
@@ -418,6 +421,7 @@ src/gz openwrt_luci https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/pa
 src/gz openwrt_packages https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/packages/
 src/gz openwrt_routing https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/routing/
 src/gz openwrt_telephony https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/telephony/
+src/gz openwrt_kiddin9 https://dl.openwrt.ai/releases/24.10/packages/aarch64_cortex-a53/kiddin9/
 EOF
 
         sed -i "/define Package\/default-settings\/install/a\\
@@ -470,7 +474,7 @@ update_menu_location() {
         sed -i 's/nas/services/g' "$samba4_path"
     fi
 
-    local tailscale_path="$BUILD_DIR/feeds/small8/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
+    local tailscale_path="$BUILD_DIR/feeds/kiddin9/luci-app-tailscale/root/usr/share/luci/menu.d/luci-app-tailscale.json"
     if [ -d "$(dirname "$tailscale_path")" ] && [ -f "$tailscale_path" ]; then
         sed -i 's/services/vpn/g' "$tailscale_path"
     fi
@@ -485,7 +489,7 @@ fix_compile_coremark() {
 
 update_homeproxy() {
     local repo_url="https://github.com/immortalwrt/homeproxy.git"
-    local target_dir="$BUILD_DIR/feeds/small8/luci-app-homeproxy"
+    local target_dir="$BUILD_DIR/feeds/kiddin9/luci-app-homeproxy"
 
     if [ -d "$target_dir" ]; then
         rm -rf "$target_dir"
@@ -535,7 +539,7 @@ update_package() {
 }
 
 update_lucky() {
-    local mk_dir="$BUILD_DIR/feeds/small8/lucky/Makefile"
+    local mk_dir="$BUILD_DIR/feeds/kiddin9/lucky/Makefile"
     if [ -d "${mk_dir%/*}" ] && [ -f "$mk_dir" ]; then
         sed -i '/Build\/Prepare/ a\	[ -f $(TOPDIR)/../patches/lucky_Linux_$(LUCKY_ARCH).tar.gz ] && install -Dm644 $(TOPDIR)/../patches/lucky_Linux_$(LUCKY_ARCH).tar.gz $(PKG_BUILD_DIR)/$(PKG_NAME)_$(PKG_VERSION)_Linux_$(LUCKY_ARCH).tar.gz' "$mk_dir"
         sed -i '/wget/d' "$mk_dir"
@@ -570,15 +574,15 @@ function update_script_priority() {
     fi
 
     # 更新mosdns服务的启动顺序
-    local mosdns_path="$BUILD_DIR/package/feeds/small8/luci-app-mosdns/root/etc/init.d/mosdns"
+    local mosdns_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-mosdns/root/etc/init.d/mosdns"
     if [ -d "${mosdns_path%/*}" ] && [ -f "$mosdns_path" ]; then
         sed -i 's/START=.*/START=94/g' "$mosdns_path"
     fi
 }
 
 function optimize_smartDNS() {
-    local smartdns_custom="$BUILD_DIR/feeds/small8/smartdns/conf/custom.conf"
-    local smartdns_patch="$BUILD_DIR/feeds/small8/smartdns/patches/010_change_start_order.patch"
+    local smartdns_custom="$BUILD_DIR/feeds/kiddin9/smartdns/conf/custom.conf"
+    local smartdns_patch="$BUILD_DIR/feeds/kiddin9/smartdns/patches/010_change_start_order.patch"
     install -Dm644 "$BASE_PATH/patches/010_change_start_order.patch" "$smartdns_patch"
 
     # 检查配置文件所在的目录和文件是否存在
@@ -601,7 +605,7 @@ EOF
 }
 
 update_mosdns_deconfig() {
-    local mosdns_conf="$BUILD_DIR/feeds/small8/luci-app-mosdns/root/etc/config/mosdns"
+    local mosdns_conf="$BUILD_DIR/feeds/kiddin9/luci-app-mosdns/root/etc/config/mosdns"
     if [ -d "${mosdns_conf%/*}" ] && [ -f "$mosdns_conf" ]; then
         sed -i 's/8000/300/g' "$mosdns_conf"
         sed -i 's/5335/5336/g' "$mosdns_conf"
@@ -609,7 +613,7 @@ update_mosdns_deconfig() {
 }
 
 fix_quickstart() {
-    local qs_index_path="$BUILD_DIR/feeds/small8/luci-app-quickstart/htdocs/luci-static/quickstart/index.js"
+    local qs_index_path="$BUILD_DIR/feeds/kiddin9/luci-app-quickstart/htdocs/luci-static/quickstart/index.js"
     local fix_path="$BASE_PATH/patches/quickstart_index.js"
     if [ -f "$qs_index_path" ] && [ -f "$fix_path" ]; then
         cat "$fix_path" >"$qs_index_path"
@@ -619,9 +623,9 @@ fix_quickstart() {
 }
 
 update_oaf_deconfig() {
-    local conf_path="$BUILD_DIR/feeds/small8/open-app-filter/files/appfilter.config"
-    local uci_def="$BUILD_DIR/feeds/small8/luci-app-oaf/root/etc/uci-defaults/94_feature_3.0"
-    local disable_path="$BUILD_DIR/feeds/small8/luci-app-oaf/root/etc/uci-defaults/99_disable_oaf"
+    local conf_path="$BUILD_DIR/feeds/kiddin9/open-app-filter/files/appfilter.config"
+    local uci_def="$BUILD_DIR/feeds/kiddin9/luci-app-oaf/root/etc/uci-defaults/94_feature_3.0"
+    local disable_path="$BUILD_DIR/feeds/kiddin9/luci-app-oaf/root/etc/uci-defaults/99_disable_oaf"
 
     if [ -d "${conf_path%/*}" ] && [ -f "$conf_path" ]; then
         sed -i \
@@ -648,7 +652,7 @@ EOF
 
 support_fw4_adg() {
     local src_path="$BASE_PATH/patches/AdGuardHome"
-    local dst_path="$BUILD_DIR/package/feeds/small8/luci-app-adguardhome/root/etc/init.d/AdGuardHome"
+    local dst_path="$BUILD_DIR/package/feeds/kiddin9/luci-app-adguardhome/root/etc/init.d/AdGuardHome"
     # 验证源路径是否文件存在且是文件，目标路径目录存在且脚本路径合法
     if [ -f "$src_path" ] && [ -d "${dst_path%/*}" ] && [ -f "$dst_path" ]; then
         # 使用 install 命令替代 cp 以确保权限和备份处理
