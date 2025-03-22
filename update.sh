@@ -135,7 +135,7 @@ update_golang() {
 }
 
 install_kiddin9() {
-    ./scripts/feeds install -p kiddin9 -f xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
+    ./scripts/feeds install -p kiddin9 -f xray-plugin dns2tcp dns2socks haproxy hysteria \
         naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
         tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
         luci-app-passwall alist luci-app-alist smartdns luci-app-smartdns v2dat mosdns luci-app-mosdns \
